@@ -72,7 +72,7 @@ public class MainUI extends JFrame implements ActionListener{
             Iterator iterator = data.keys();
             while (iterator.hasNext()){
                 String key = (String) iterator.next();
-                String url = (String) jsonObject.get(key);
+                String url = (String) data.get(key);
                 String result2 = PDFPrint.print(url);
                 if (Contains.SUCCESS.equals(result2)){
                     JSONObject jsonObject2 = new JSONObject();
@@ -113,7 +113,7 @@ public class MainUI extends JFrame implements ActionListener{
             byte[] b = decoder.decodeBuffer(s.toString());
             bianhao = new String(b, encoding);
         }else {
-            throw new Exception("找不到文件夹");
+            throw new Exception("找不到编号文件夹");
         }
         if (bianhao == null){
             throw new Exception("编号为空");

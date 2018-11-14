@@ -55,6 +55,9 @@ public class PDFPrint {
 //                COSObject cosObject = (COSObject)dic1.getItem(COSName.getPDFName("F" + i));
 //                COSDictionary a = (COSDictionary)cosObject.getObject();
                 COSBase cosObject = dic1.getItem(COSName.getPDFName("F" + i));
+                if (cosObject ==  null){
+                    continue;
+                }
                 COSDictionary a = getCOSDictionary(cosObject);
                 String aaaa= a.getCOSName(COSName.BASE_FONT).toString();
 

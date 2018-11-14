@@ -1,5 +1,6 @@
 package com.pdf.httpRequest;
 
+import com.pdf.common.Contains;
 import net.sf.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -22,14 +23,16 @@ public class Request {
         HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
         httpURLConnection.setDoInput(true);
         httpURLConnection.setDoOutput(true);
+        httpURLConnection.setUseCaches(false);
         httpURLConnection.setInstanceFollowRedirects(true);
         httpURLConnection.setRequestMethod("POST");
-        httpURLConnection.setRequestProperty("Content-Type", "application/x-www/form-urlencoded");
+        httpURLConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
         httpURLConnection.connect();
         OutputStreamWriter out = new OutputStreamWriter(httpURLConnection.getOutputStream(), "UTF-8");
 
         Iterator iterator = jsonObject.keys();
         String param = "";
+        System.out.println(jsonObject.toString());
         while (iterator.hasNext()){
             String key = (String) iterator.next();
             String value = (String) jsonObject.get(key);
@@ -46,5 +49,11 @@ public class Request {
             result += line;
         }
         return result;
+    }
+
+    public static void main(String[] args) throws Exception {
+        JSONObject jsonObject2 = new JSONObject();
+        jsonObject2.put(Contains.PRINTER_NUM, "001");
+        postRequest(jsonObject2,"http://hqyp.fenith.com/api/getPrintFiles");
     }
 }
