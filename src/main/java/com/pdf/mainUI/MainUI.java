@@ -87,7 +87,7 @@ public class MainUI extends JFrame implements ActionListener{
     public static void main(String[] args) throws Exception {
         try {
             logger.info("123");
-//            getBianhao();
+            getBianhao();
             MainUI mainUI = new MainUI();
         }catch(Exception e){
             e.printStackTrace();
