@@ -15,6 +15,7 @@ import javax.print.PrintServiceLookup;
 import java.awt.print.Pageable;
 import java.awt.print.PrinterJob;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -77,7 +78,7 @@ public class PDFPrint {
                     a.setItem(COSName.BASE_FONT, COSName.getPDFName("SimSunBold"));
                     b.setItem(COSName.BASE_FONT, COSName.getPDFName("SimSunBold"));
                     c.setItem(COSName.FONT_NAME, COSName.getPDFName("SimSunBold"));
-                }else if ("COSName{????}" .equals(aaaa)){
+                }else if ("COSName{����}" .equals(aaaa)){
                     a.setItem(COSName.BASE_FONT, COSName.getPDFName("SimSun"));
                     b.setItem(COSName.BASE_FONT, COSName.getPDFName("SimSun"));
                     c.setItem(COSName.FONT_NAME, COSName.getPDFName("SimSun"));
@@ -103,7 +104,11 @@ public class PDFPrint {
             result = Contains.SUCCESS;
         } catch (Exception e){
             e.printStackTrace();
-            logger.info(e.getMessage());
+            logger.error(e.getMessage());
+            if (e instanceof FileNotFoundException){
+                logger.error("文件找不到，直接返回！");
+                return Contains.SUCCESS;
+            }
         } finally {
             if (document != null) {
                 try {
@@ -125,5 +130,9 @@ public class PDFPrint {
             dictionary = (COSDictionary) cosBase;
         }
         return dictionary;
+    }
+
+    public static void main(String[] args) {
+        print("http://hqyp.fenith.com/pdf/1539153856615***21.pdf");
     }
 }
