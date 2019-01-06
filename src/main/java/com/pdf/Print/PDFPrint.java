@@ -27,15 +27,18 @@ public class PDFPrint {
 
     public static String print(String path){
         PDDocument document = null;
+        PDDocument doc = null;
         String result = Contains.FAIL;
+        InputStream inputStream = null;
+        URLConnection urlConnection = null;
 
         try {
 
             logger.info("begin to print");
             URL url = new URL(path);
 
-            URLConnection urlConnection = url.openConnection();
-            InputStream inputStream = urlConnection.getInputStream();
+            urlConnection = url.openConnection();
+            inputStream = urlConnection.getInputStream();
 
             String pdfFile = "123";
             document = PDDocument.load(inputStream);
@@ -91,7 +94,7 @@ public class PDFPrint {
             dic.setItem(COSName.FONT, dic1);
             diction.setItem(COSName.RESOURCES, dic);
             page = new PDPage(diction);
-            PDDocument doc = new PDDocument();
+            doc = new PDDocument();
             doc.addPage(page);
             PrinterJob printJob = PrinterJob.getPrinterJob();
             printJob.setJobName(new File(pdfFile).getName());
@@ -107,15 +110,22 @@ public class PDFPrint {
             logger.error(e.getMessage());
             if (e instanceof FileNotFoundException){
                 logger.error("文件找不到，直接返回！");
-                return Contains.SUCCESS;
+                result = Contains.SUCCESS;
             }
         } finally {
-            if (document != null) {
-                try {
+            try {
+                if (document != null) {
                     document.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
+                if (doc != null) {
+                    doc.close();
+                }
+                if (inputStream != null){
+                    inputStream.close();
+                }
+            } catch (IOException e) {
+                logger.error("关闭流出错");
+                e.printStackTrace();
             }
         }
         return result;

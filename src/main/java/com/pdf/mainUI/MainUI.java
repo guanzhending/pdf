@@ -10,12 +10,8 @@ import sun.misc.BASE64Decoder;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.awt.event.*;
+import java.io.*;
 import java.util.Iterator;
 
 public class MainUI extends JFrame implements ActionListener{
@@ -40,13 +36,13 @@ public class MainUI extends JFrame implements ActionListener{
                 Thread thread = new Thread(){
                     @Override
                     public void run() {
-                        try {
-                            while (true){
+                        while (true){
+                            try {
                                 request();
                                 Thread.sleep(1000);
+                            }catch (Exception e){
+                                logger.error("网络出现异常，正在重连···");
                             }
-                        } catch (Exception e1) {
-                            e1.printStackTrace();
                         }
                     }
                 };
@@ -146,8 +142,93 @@ public class MainUI extends JFrame implements ActionListener{
         this.setTitle("打印机设置");
         this.setSize(1000,500);
         this.setLocation(400, 200);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setVisible(true);
+//        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(true);
+        this.setLocationRelativeTo(null);
+        this.setTray();
+        this.setVisible(true);
+
+    }
+
+    //添加托盘显示：1.先判断当前平台是否支持托盘显示
+    public void setTray() {
+
+        if(SystemTray.isSupported()){//判断当前平台是否支持托盘功能
+            //创建托盘实例
+            SystemTray tray = SystemTray.getSystemTray();
+            //创建托盘图标：1.显示图标Image 2.停留提示text 3.弹出菜单popupMenu 4.创建托盘图标实例
+            //1.创建Image图像
+            File file = new File("");
+            String courseFile = null;
+            try {
+                courseFile = file.getCanonicalPath() + "\\print.jpg";
+            } catch (IOException e) {
+                logger.error("获取图片资源失败");
+                e.printStackTrace();
+            }
+            Image image = Toolkit.getDefaultToolkit().getImage(courseFile);
+            //2.停留提示text
+            String text = "PDF Print";
+            //3.弹出菜单popupMenu
+            PopupMenu popMenu = new PopupMenu();
+            MenuItem itmOpen = new MenuItem("open");
+            itmOpen.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent e) {
+                    Show();
+                }
+            });
+            MenuItem itmExit = new MenuItem("close");
+            itmExit.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent e) {
+                    Exit();
+                }
+            });
+            popMenu.add(itmOpen);
+            popMenu.add(itmExit);
+
+            addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    int option = JOptionPane.showConfirmDialog(MainUI.this,"是否最小化到托盘?",
+                            "提示:", JOptionPane.YES_NO_OPTION);
+                    if (option == JOptionPane.YES_OPTION){
+                        UnVisible();
+                    }else {
+                        Exit();
+                    }
+                }
+            });
+
+            //创建托盘图标
+            TrayIcon trayIcon = new TrayIcon(image,text,popMenu);
+            //设置自动调整图标大小以适应当前平台的托盘图标显示
+            trayIcon.setImageAutoSize(true);
+
+            trayIcon.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (e.getClickCount() == 2){
+                        Show();
+                    }
+                }
+            });
+            //将托盘图标加到托盘上
+            try {
+                tray.add(trayIcon);
+            } catch (AWTException e1) {
+                e1.printStackTrace();
+            }
+        }
+    }
+
+    //内部类中不能直接调用外部类（this不能指向）
+    public void UnVisible() {
+        this.setVisible(false);
+    }
+    public void Show() {
+        this.setVisible(true);
+    }
+    public void Exit() {
+        System.exit(0);
     }
 }
