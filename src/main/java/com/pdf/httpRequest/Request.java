@@ -16,6 +16,7 @@ public class Request {
     public static Logger logger = LoggerFactory.getLogger(Request.class);
 
     public static String postRequest(JSONObject jsonObject, String requestURL) throws Exception{
+        logger.info("开始请求，入参：{}，{}",jsonObject, requestURL);
         String result = "";
         BufferedReader send_in = null;
         HttpURLConnection httpURLConnection = null;
@@ -49,8 +50,9 @@ public class Request {
             while ((line = send_in.readLine()) != null){
                 result += line;
             }
+            logger.info("result:{}", result);
         }catch (Exception e){
-            logger.error(e.getMessage());
+            logger.error("postRequest 异常：{}", e);
             throw new Exception(e);
         }finally {
             try {

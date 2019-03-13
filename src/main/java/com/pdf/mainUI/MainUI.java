@@ -36,14 +36,18 @@ public class MainUI extends JFrame implements ActionListener{
                 Thread thread = new Thread(){
                     @Override
                     public void run() {
-                        while (true){
-                            try {
-                                request();
-                                Thread.sleep(1000);
-                            }catch (Exception e){
-                                logger.error("网络出现异常，正在重连···");
-                            }
+                    while (true){
+                        try {
+                            request();
+                        }catch (Exception e){
+                            logger.error("网络出现异常，正在重连···");
                         }
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e1) {
+                            logger.error("线程出错···");
+                        }
+                    }
                     }
                 };
                 thread.start();
@@ -60,7 +64,7 @@ public class MainUI extends JFrame implements ActionListener{
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(Contains.PRINTER_NUM, bianhao);
         String result = Request.postRequest(jsonObject, Contains.PRINTER_URL);
-        logger.info(result);
+        logger.info("请求结果：{}",result);
         JSONObject jsonObject1 = JSONObject.fromObject(result);
         String code = jsonObject1.get("code").toString();
         if ("200".equals(code)){
@@ -71,6 +75,7 @@ public class MainUI extends JFrame implements ActionListener{
                 String url = (String) data.get(key);
                 String result2 = PDFPrint.print(url);
                 if (Contains.SUCCESS.equals(result2)){
+                    logger.info("请求成功：{}",result2);
                     JSONObject jsonObject2 = new JSONObject();
                     jsonObject2.put(Contains.PRINTER_NUM, bianhao);
                     jsonObject2.put(Contains.ID, key);
@@ -87,6 +92,7 @@ public class MainUI extends JFrame implements ActionListener{
             MainUI mainUI = new MainUI();
         }catch(Exception e){
             e.printStackTrace();
+            logger.error("程序运行错误：{}", e);
             jb1.setText(e.getMessage());
             jb1.setEnabled(false);
         }
@@ -108,6 +114,7 @@ public class MainUI extends JFrame implements ActionListener{
             BASE64Decoder decoder = new BASE64Decoder();
             byte[] b = decoder.decodeBuffer(s.toString());
             bianhao = new String(b, encoding);
+            logger.info("获取编号为：{}", bianhao);
         }else {
             throw new Exception("找不到编号文件夹");
         }

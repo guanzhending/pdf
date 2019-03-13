@@ -64,6 +64,7 @@ public class PDFPrint {
                 }
                 COSDictionary a = getCOSDictionary(cosObject);
                 String aaaa= a.getCOSName(COSName.BASE_FONT).toString();
+                logger.info("aaa = {}", aaaa);
 
                 COSArray array = (COSArray) a.getItem(COSName.DESCENDANT_FONTS);
 //                COSObject cosObject1 = (COSObject)array.get(0);
@@ -103,15 +104,15 @@ public class PDFPrint {
             printJob.setPrintService(defaultService);
             Pageable pageable = new PDFPageable(doc);
             printJob.setPageable(pageable);
+            logger.info("begin to print···");
             printJob.print();
+            logger.info("print end···");
             result = Contains.SUCCESS;
         } catch (Exception e){
             e.printStackTrace();
-            logger.error(e.getMessage());
-            if (e instanceof FileNotFoundException){
-                logger.error("文件找不到，直接返回！");
-                result = Contains.SUCCESS;
-            }
+            logger.error("文件打出错：{}", e);
+            logger.error("文件打印出错，直接返回！");
+            result = Contains.SUCCESS;
         } finally {
             try {
                 if (document != null) {
@@ -124,7 +125,7 @@ public class PDFPrint {
                     inputStream.close();
                 }
             } catch (IOException e) {
-                logger.error("关闭流出错");
+                logger.error("关闭流出错:{}",e);
                 e.printStackTrace();
             }
         }
