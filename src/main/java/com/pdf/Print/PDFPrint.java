@@ -21,6 +21,13 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+
+/**
+ * 如果报找不到 msatc.ttf，那么删除c:\windows\Fonts目录下的msatc.ttf
+ * 删除 msatc.ttf 的参考地址：http://www.xitongcheng.com/jiaocheng/win7_article_35712.html
+ * PDF打印主要类
+ *
+ */
 public class PDFPrint {
 
     public static Logger logger = LoggerFactory.getLogger(MainUI.class);
@@ -44,7 +51,6 @@ public class PDFPrint {
             document = PDDocument.load(inputStream);
             PDAcroForm acroForm = new PDAcroForm(document);
             document.getDocumentCatalog().setAcroForm(acroForm);
-
             PDPage  page = document.getPage(0);
             COSDictionary diction = page.getCOSObject();
             diction.setNeedToBeUpdated(true);
@@ -69,6 +75,9 @@ public class PDFPrint {
                 COSArray array = (COSArray) a.getItem(COSName.DESCENDANT_FONTS);
 //                COSObject cosObject1 = (COSObject)array.get(0);
 //                COSDictionary b = (COSDictionary)cosObject1.getObject();
+                if(array == null || array.size() <= 0){
+                    continue;
+                }
                 COSBase cosObject1 = array.get(0);
                 COSDictionary b = getCOSDictionary(cosObject1);
 
@@ -103,6 +112,7 @@ public class PDFPrint {
             PrintService defaultService = PrintServiceLookup.lookupDefaultPrintService();
             printJob.setPrintService(defaultService);
             Pageable pageable = new PDFPageable(doc);
+
             printJob.setPageable(pageable);
             logger.info("begin to print···");
             printJob.print();
@@ -144,6 +154,6 @@ public class PDFPrint {
     }
 
     public static void main(String[] args) {
-        print("http://hqyp.fenith.com/pdf/1539153856615***21.pdf");
+        print("http://hqyp.fenith.com/temp_pdf/5c89aadc03790314.pdf");
     }
 }
